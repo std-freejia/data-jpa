@@ -4,7 +4,7 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
-  jpa:
+  jpa: # 띄어쓰기2칸 주의하기
     hibernate:
       ddl-auto: create  # 애플리케이션 실행 시 DB에 있던 테이블 다 드랍하고, 전부 새로 생성.
     properties:

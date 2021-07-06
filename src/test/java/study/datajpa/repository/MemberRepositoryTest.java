@@ -30,5 +30,12 @@ public class MemberRepositoryTest {
         assertThat(findMember.getId()).isEqualTo(member.getId());
         assertThat(findMember.getUsername()).isEqualTo(member.getUsername());
         assertThat(findMember).isEqualTo(member);
+
+        /** 콘솔에 JPA쿼리에 파라미터 들어가는 것을 확인 !
+         * p6spy-spring-boot-starter:1.5.7  를 build.gradle에 추가
+         * 아래 처럼 출력된다.
+         * insert into member (username, id) values (?, ?)
+         * insert into member (username, id) values ('memberA', 1); <-- 콘솔에 출력
+         */
     }
 }
