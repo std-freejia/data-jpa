@@ -4,13 +4,13 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
-jpa:
-  hibernate:
-    ddl-auto: create # 애플리케이션 실행 시 DB에 있던 테이블 다 드랍하고, 전부 새로 생성.
-  properties:
+  jpa:
     hibernate:
-      # show_sql: true # JPA 실행 쿼리를 콘솔에 출력
-      format_sql: true # 출력 포맷팅
+      ddl-auto: create  # 애플리케이션 실행 시 DB에 있던 테이블 다 드랍하고, 전부 새로 생성.
+    properties:
+      hibernate:
+        # show_sql: true # JPA 실행 쿼리를 콘솔에 출력
+        format_sql: true # 출력 포맷팅
 logging.level:
-  org.hibernate.SQL: debug # JPA 실행 쿼리를 로그파일에 출력하여 저장
+  org.hibernate.SQL: debug # JPA 실행 쿼리를 로거를 통해 출력.  참고) 모든 로그 출력은 가급적 로거를 통해 남기자.
   #  org.hibernate.type: trace  # 파라미터 바인딩 된 것을 함께 출력
