@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.*;
 @Rollback(value = false)
 public class MemberRepositoryTest {
 
-    @Autowired MemberRepository memberRepository;
+    @Autowired MemberRepository memberRepository; // 인터페이스
 
     @Test
     public void testMember(){
