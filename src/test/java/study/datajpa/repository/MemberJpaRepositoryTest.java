@@ -90,6 +90,31 @@ class MemberJpaRepositoryTest {
         List<Member> result = memberJpaRepository.findByUsername("AAA");
         Member findMember = result.get(0);
         assertThat(findMember).isEqualTo(m1);
+    }
 
+    /** 페이징 */
+    @Test
+    public void paging(){
+        // given : 데이터 5개 만들어서 저장
+        memberJpaRepository.save(new Member("member1", 10));
+        memberJpaRepository.save(new Member("member2", 10));
+        memberJpaRepository.save(new Member("member3", 10));
+        memberJpaRepository.save(new Member("member4", 10));
+        memberJpaRepository.save(new Member("member5", 10));
+
+        int age = 10;
+        int offset = 1;
+        int limit = 3;
+
+        // when
+        List<Member> members = memberJpaRepository.findByPage(age, offset, limit); // 컨텐츠 가져옴
+        long totalCount = memberJpaRepository.totalCount(age); // 데이터 총 개수 가져옴
+
+        // 페이지 계산 공식 적용..
+        // totalPage, 마지막페이지, 최초 페이지 확인 로직 찾아서 구현하기.
+
+        // then
+        assertThat(members.size()).isEqualTo(3); // 0번째 데이터에서 3개를 가져옴
+        assertThat(totalCount).isEqualTo(5); // 데이터 총 개수
     }
 }
