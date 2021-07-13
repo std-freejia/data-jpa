@@ -16,7 +16,8 @@ import static org.assertj.core.api.Assertions.*;
 @Rollback(value = false) // @Test가 끝나도 롤백 안한다.
 class MemberJpaRepositoryTest {
 
-    @Autowired MemberJpaRepository memberJpaRepository; /** 순수 jpa 적용 */
+    /** MemberJpaRepository Test : 순수 jpa 적용 */
+    @Autowired MemberJpaRepository memberJpaRepository;
 
     // @Autowired MemberRepository memberRepository; /** 스프링 데이터 jpa 를 적용해보자! */
 
@@ -76,5 +77,19 @@ class MemberJpaRepositoryTest {
 
         assertThat(result.get(0).getUsername()).isEqualTo("AAA");
         assertThat(result.get(0).getAge()).isEqualTo(20);
+    }
+
+    @Test
+    public void testNamedQuery(){
+        Member m1 = new Member("AAA", 10);
+        Member m2 = new Member("BBB", 20);
+
+        memberJpaRepository.save(m1);
+        memberJpaRepository.save(m2);
+
+        List<Member> result = memberJpaRepository.findByUsername("AAA");
+        Member findMember = result.get(0);
+        assertThat(findMember).isEqualTo(m1);
+
     }
 }

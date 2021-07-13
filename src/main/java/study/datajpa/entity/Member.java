@@ -8,6 +8,10 @@ import javax.persistence.*;
 @Getter @Setter // 실무에서는 가급적 @Setter 사용 자제.
 @NoArgsConstructor(access = AccessLevel.PROTECTED) /** JPA 엔티티의 기본 생성자가 만들어줌 */
 @ToString(of = {"id", "username", "age"}) /** 참조 필드 Team 은 무한루프 탈 수 있으니 지양하기 */
+@NamedQuery(
+        name="Member.findByUsername",
+        query="select m from Member m where m.username=:username"
+)
 public class Member {
 
     @Id @GeneratedValue
