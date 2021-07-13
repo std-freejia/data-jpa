@@ -4,6 +4,9 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.dto.MemberDto;
@@ -162,5 +165,33 @@ public class MemberRepositoryTest {
         System.out.println("optional = " + optional);
     }
 
+    /** 데이터 JPA 페이징 */
+    @Test
+    public void paging(){
+        // given : 데이터 5개 만들어서 저장
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 10));
+        memberRepository.save(new Member("member3", 10));
+        memberRepository.save(new Member("member4", 10));
+        memberRepository.save(new Member("member5", 10));
 
+        int age = 10;
+
+        /** 스프링 데이터 JPA에서는 페이지 인덱스를 0부터 센다. */
+        // 0페이지에 3개 가져오기. 소팅 조건(기준과 오름차순 내림차순)
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+
+        // when
+        Page<Member> page = memberRepository.findByAge(age, pageRequest); // 컨텐츠 가져옴
+        // 반환 타입이 Page라면, 스프링 데이터JPA가 count 쿼리를 실행한다.
+
+        // then
+        List<Member> content = page.getContent();
+        long totalElements = page.getTotalElements();
+
+        for (Member member : content) {
+            System.out.println("member = " + member);
+        }
+        System.out.println("totalElements = " + totalElements);
+    }
 }
