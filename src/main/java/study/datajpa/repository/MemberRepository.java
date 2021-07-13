@@ -17,4 +17,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     /** NamedQuery  */
     //@Query(name="Member.findByUsername")  /** 이 애노테이션 지워도 동작함! */
     List<Member> findByUsername(@Param("username")String username); // JPQL의 파라미터를 넣을 때 @Param를 명시한다.
+
+    /** @Query : 긴 JPQL 작성 가능하면서, 함수명을 짧게 작성 가능.*/
+    @Query("select m from Member m  where m.username = :username and m.age = :age")
+    List<Member> findUser(@Param("username")String username, @Param("age")int age);
+
 }
