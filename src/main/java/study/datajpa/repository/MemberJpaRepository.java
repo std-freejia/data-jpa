@@ -56,4 +56,24 @@ public class MemberJpaRepository {
                         .setParameter("username", username)
                         .getResultList();
     }
+
+    /** 순수 JPA 페이징과 정렬
+     * n번째 데이터부터 시작하여 limit개씩 가져온다.
+     * offset: 가져올 데이터의 순서
+     * limit: 가져올 개수
+     * */
+    public List<Member> findByPage(int age, int offset, int limit){
+        return em.createQuery("select m from Member m where m.age = :age order by m.username desc")
+                .setParameter("age", age)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+    }
+
+    /** 페이징에서, 현재 페이지가 몇 번째 페이지 인지 파악하기 위함 */
+    public long totalCount(int age){
+    return em.createQuery("select count(m) from Member m where m.age = :age", Long.class)
+            .setParameter("age", age)
+            .getSingleResult();
+    }
 }

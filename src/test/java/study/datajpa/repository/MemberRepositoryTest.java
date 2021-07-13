@@ -160,6 +160,7 @@ public class MemberRepositoryTest {
          * NotUniqueResultException(JPA error) -> IncorrectResultSizeException  (Spring error로 감싸서 출력)*/
         Optional<Member> optional = memberRepository.findOptionalByUsername("AAA");
         System.out.println("optional = " + optional);
-
     }
+
+
 }
