@@ -8,6 +8,7 @@ import study.datajpa.entity.Member;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 /** 인터페이스 JpaRepository를 상속받는다 */
 public interface MemberRepository extends JpaRepository<Member, Long> {
@@ -24,7 +25,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("select m from Member m  where m.username = :username and m.age = :age")
     List<Member> findUser(@Param("username")String username, @Param("age")int age);
 
-
     /** 값 조회 */
     @Query("select m.username from Member m")
     List<String> findUsernameList();
@@ -36,4 +36,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     /** 파라미터 바인딩 : 이름 기반으로 쓸 것! */
     @Query("select m from Member m where m.username in :names")
     List<Member> findByName(@Param("names") Collection<String> names);
+
+    /** 반환 타입 */
+    List<Member> findListByUsername(String username); // 컬렉션
+    Member findMemberByUsername(String username); // 단건
+    Optional<Member> findOptionalByUsername(String username); //단건 Optional
 }

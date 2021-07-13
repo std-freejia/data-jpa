@@ -110,7 +110,6 @@ public class MemberRepositoryTest {
         }
     }
 
-
     @Test
     public void findByNames(){ // @Query
         Member m1 = new Member("AAA", 10);
@@ -122,5 +121,45 @@ public class MemberRepositoryTest {
         for (Member member : resultList) {
             System.out.println("member = " + member);
         }
+    }
+
+    @Test
+    public void testReturnType(){ // 반환타입을 유연하게 받을 수 있다.
+        Member m1 = new Member("AAA", 10);
+        Member m2 = new Member("BBB", 20);
+        memberRepository.save(m1);
+        memberRepository.save(m2);
+
+        /** 중요!
+         * 조회 결과가 없다면, null 이 아니라, 빈 컬렉션을 반환한다!
+         * */
+        List<Member> list = memberRepository.findListByUsername("AAA");
+        System.out.println("list.get(0).getUsername() = " + list.get(0).getUsername());
+        System.out.println("list.size() = " + list.size());
+
+        /** 중요!
+         *  컬렉션 으로 받지 않을 때, 단건 조회 시 NULL 반환한다.
+         * */
+        Member result = memberRepository.findMemberByUsername("AAA");
+        System.out.println("result = " + result);
+
+        /** 좋은 방법!
+         * 조회할 때 데이터가 있을지 없을지 모르면, Optional 로 감싸는 것이 가장 안전하다. */
+        Optional<Member> optional = memberRepository.findOptionalByUsername("BBB");
+        System.out.println("optional = " + optional);
+    }
+
+    @Test
+    public void testReturnTypeError(){ // 반환타입을 유연하게 받을 수 있다.
+        Member m1 = new Member("AAA", 10);
+        Member m2 = new Member("AAA", 20);
+        memberRepository.save(m1);
+        memberRepository.save(m2);
+
+        /** AAA가 2명이라서, 에러 발생
+         * NotUniqueResultException(JPA error) -> IncorrectResultSizeException  (Spring error로 감싸서 출력)*/
+        Optional<Member> optional = memberRepository.findOptionalByUsername("AAA");
+        System.out.println("optional = " + optional);
+
     }
 }
