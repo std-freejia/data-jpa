@@ -178,7 +178,7 @@ public class MemberRepositoryTest {
 
         int age = 10;
 
-        /** 스프링 데이터 JPA에서는 페이지 인덱스를 0부터 센다. */
+        /** [주의] 스프링 데이터 JPA에서는 페이지 인덱스를 0부터 센다. */
         // 0페이지에 3개 가져오기. 소팅 조건(기준과 오름차순 내림차순)
         PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
 
@@ -186,9 +186,11 @@ public class MemberRepositoryTest {
         Page<Member> page = memberRepository.findByAge(age, pageRequest); // 컨텐츠 가져옴
         // 반환 타입이 Page라면, 스프링 데이터JPA가 count 쿼리를 알아서 실행한다.
 
-        /**
-         * 데이터를 가져오는 것 보다, totalCount를 가져오는 것이 더 DB에 부담이 된다.
-         */
+        /** [Page를 DTO로 변환하기] map()사용 */
+        Page<MemberDto> memberDtos = page.map(m -> new MemberDto(m.getId(), m.getUsername(), null));
+
+        /** 데이터를 가져오는 것 보다, totalCount를 가져오는 것이 더 DB에 부담이 된다. */
+
         // then
         List<Member> content = page.getContent();
         long totalElements = page.getTotalElements();
