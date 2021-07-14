@@ -14,6 +14,8 @@ import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 import study.datajpa.entity.Team;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +29,8 @@ public class MemberRepositoryTest {
 
     @Autowired MemberRepository memberRepository; // 인터페이스
     @Autowired TeamRepository teamRepository;
+
+    @PersistenceContext EntityManager em;
 
     @Test
     public void testMember(){
@@ -247,5 +251,35 @@ public class MemberRepositoryTest {
          * from member member0_ where member0_.age=10
          * order by member0_.username desc limit 4;
          * */
+    }
+
+    @Test
+    public void bulkAgeAdd(){
+        // given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 20));
+        memberRepository.save(new Member("member3", 21));
+        memberRepository.save(new Member("member4", 19));
+        memberRepository.save(new Member("member5", 25));
+
+        /** 같은것 동시 수정: shift + F6 */
+
+        // when
+        int resultCount = memberRepository.bulkAgePlus(20);// 20살 이상인 사람들 모두 +1
+        em.flush(); /** DB에 반영되지 않은 SQL들이 있다면 수행한다. */
+        em.clear(); /** 영속성 컨텍스트를 초기화한다. */
+
+        /**
+         * 벌크 연산은, DB에 수정쿼리를 바로 수행하기 때문에 DB에는 수정이 되지만, 영속성 컨텍스트에 변경사항이 반영되지 않는다.
+         * 출력 해보면 영속성 컨텍스트에 member5의 나이는 25로 출력된다. DB에 직접 조회하면 26살임.
+         * 따라서 벌크 연산 직후에 영속성 컨텍스트를 초기화해야 한다. em.flush(), em.clear().
+         */
+        List<Member> members = memberRepository.findByUsername("member5");
+        Member member5 = members.get(0);
+        System.out.println("member5.getAge() = " + member5.getAge());
+
+
+        // then
+        assertThat(resultCount).isEqualTo(3);
     }
 }
