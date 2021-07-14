@@ -117,4 +117,20 @@ class MemberJpaRepositoryTest {
         assertThat(members.size()).isEqualTo(3); // 0번째 데이터에서 3개를 가져옴
         assertThat(totalCount).isEqualTo(5); // 데이터 총 개수
     }
+
+    @Test
+    public void bulkUpdateTest(){  /** 벌크성 수정 쿼리 순수 JPA */
+        // given
+        memberJpaRepository.save(new Member("member1", 10));
+        memberJpaRepository.save(new Member("member2", 20));
+        memberJpaRepository.save(new Member("member3", 21));
+        memberJpaRepository.save(new Member("member4", 19));
+        memberJpaRepository.save(new Member("member5", 25));
+
+        // when
+        int resultCount = memberJpaRepository.bulkAgePlus(20);// 20살 이상인 사람들 모두 +1
+
+        // then
+        assertThat(resultCount).isEqualTo(3);
+    }
 }
