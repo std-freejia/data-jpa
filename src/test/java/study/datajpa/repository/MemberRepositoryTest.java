@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
@@ -165,9 +166,9 @@ public class MemberRepositoryTest {
         System.out.println("optional = " + optional);
     }
 
-    /** 데이터 JPA 페이징 */
+    /** 데이터 JPA 페이징 : Page */
     @Test
-    public void paging(){
+    public void pagingPage(){
         // given : 데이터 5개 만들어서 저장
         memberRepository.save(new Member("member1", 10));
         memberRepository.save(new Member("member2", 10));
@@ -183,8 +184,11 @@ public class MemberRepositoryTest {
 
         // when
         Page<Member> page = memberRepository.findByAge(age, pageRequest); // 컨텐츠 가져옴
-        // 반환 타입이 Page라면, 스프링 데이터JPA가 count 쿼리를 실행한다.
+        // 반환 타입이 Page라면, 스프링 데이터JPA가 count 쿼리를 알아서 실행한다.
 
+        /**
+         * 데이터를 가져오는 것 보다, totalCount를 가져오는 것이 더 DB에 부담이 된다.
+         */
         // then
         List<Member> content = page.getContent();
         long totalElements = page.getTotalElements();
@@ -193,5 +197,53 @@ public class MemberRepositoryTest {
             System.out.println("member = " + member);
         }
         System.out.println("totalElements = " + totalElements);
+
+        // 검증
+        assertThat(content.size()).isEqualTo(3); // 3개씩 가져오니까.
+        assertThat(page.getTotalElements()).isEqualTo(5); // 데이터 총 개수
+        assertThat(page.getNumber()).isEqualTo(0); // 페이지 넘버
+        assertThat(page.getTotalPages()).isEqualTo(2); // 총 페이지 개수
+        assertThat(page.isFirst()).isTrue(); // 여기가 첫 페이지인지
+        assertThat(page.hasNext()).isTrue(); // 다음 페이지가 존재하는지
+    }
+
+    /** 데이터 JPA 페이징 : Slice */
+    @Test
+    public void pagingSlice() {
+        // given : 데이터 5개 만들어서 저장
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 10));
+        memberRepository.save(new Member("member3", 10));
+        memberRepository.save(new Member("member4", 10));
+        memberRepository.save(new Member("member5", 10));
+
+        int age = 10;
+
+        /** 스프링 데이터 JPA에서는 페이지 인덱스를 0부터 센다. */
+        // 0페이지에 3개 가져오기. 소팅 조건(기준과 오름차순 내림차순)
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+
+        // when
+        Slice<Member> page = memberRepository.findMemberSliceByAge(age, pageRequest); // 컨텐츠 가져옴
+        // 반환 타입이 Slice라면, total count 쿼리를 실행하지 않는다.
+
+        // then
+        List<Member> content = page.getContent();
+
+        assertThat(content.size()).isEqualTo(3); // 3개씩 가져오니까.
+        //assertThat(page.getTotalElements()).isEqualTo(5); // 데이터 총 개수 -> /** Slice에 없는 기능*/
+        assertThat(page.getNumber()).isEqualTo(0); // 페이지 넘버
+        //assertThat(page.getTotalPages()).isEqualTo(2); // 총 페이지 개수 -> /** Slice에 없는 기능*/
+        assertThat(page.isFirst()).isTrue(); // 여기가 첫 페이지인지
+        assertThat(page.hasNext()).isTrue(); // 다음 페이지가 존재하는지
+
+        /**
+         * 한 페이지에 요청을 3개 하더라도, +1씩 더 가져오는 Slice 방식
+         * -> '더보기'기능 유무 보여주는 것이 편리하다.
+         *
+         * select member0_.member_id as member_i1_0_, member0_.age as age2_0_, ...
+         * from member member0_ where member0_.age=10
+         * order by member0_.username desc limit 4;
+         * */
     }
 }

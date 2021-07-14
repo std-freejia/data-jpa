@@ -2,6 +2,7 @@ package study.datajpa.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -44,6 +45,16 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Member findMemberByUsername(String username); // 단건
     Optional<Member> findOptionalByUsername(String username); //단건 Optional
 
-    /** 페이징 */
+    /** 페이징 : Page Pageable 인터페이스를 넘기는데, PageRequest 구현체를 주로 씀. */
+    @Query(value = "select m from Member m left join m.team t",
+            countQuery="select count(m.username) from Member m")
     Page<Member> findByAge(int age, Pageable pageable); // Pageable : 현재 페이지
+
+    /** 자동으로 count  쿼리를 실행하는 Page의 경우,
+     * count 쿼리 실행 시, 종종 불필요한 join 등과 같은 비효율을 줄여야 할 경우가 있다.
+     * (쿼리가 복잡할 경우, count 쿼리에 join이 들어가지 않도록 쿼리를 분리하면 좋다.)
+     * */
+
+    /** 페이징 : Slice  */
+    Slice<Member> findMemberSliceByAge(int age, Pageable pageable); // Pageable : 현재 페이지
 }
