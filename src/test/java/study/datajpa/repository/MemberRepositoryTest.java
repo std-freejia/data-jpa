@@ -304,6 +304,8 @@ public class MemberRepositoryTest {
         // when
         // List<Member> members = memberRepository.findAll();
         List<Member> members = memberRepository.findEntityGraphByUsername("member1");
+        // List<Member> members = memberRepository.findNamedEntityGraphByUsername("member1");
+
 
         for (Member member : members) {
             System.out.println("member = " + member.getUsername());

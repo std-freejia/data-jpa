@@ -82,4 +82,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     /** 패치조인 + 쿼리메소드 */
     @EntityGraph(attributePaths = {"team"})
     List<Member> findEntityGraphByUsername(@Param("username") String username);
+
+    /** @NamedEntityGraph */
+    @EntityGraph("Member.all")
+    List<Member> findNamedEntityGraphByUsername(@Param("username") String username);
+
 }
