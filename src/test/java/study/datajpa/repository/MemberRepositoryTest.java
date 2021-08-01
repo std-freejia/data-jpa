@@ -282,4 +282,40 @@ public class MemberRepositoryTest {
         // then
         assertThat(resultCount).isEqualTo(3);
     }
+
+    @Test
+    public void findMemberLazy(){/** fetch join 을 이해해야 JPA를 실무에서 쓸 수 있다. */
+
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+
+        Member member1 = new Member("member1", 10, teamA);
+        Member member2 = new Member("member2", 20, teamB);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        em.flush(); // 변경 사항 반영할 sql 실행
+        em.clear(); // 영속성 컨텍스트 초기화
+
+        // when
+        List<Member> members = memberRepository.findMemberFetchJoin();
+
+        for (Member member : members) {
+            System.out.println("member = " + member.getUsername());
+            System.out.println("member.teamClass = " + member.getTeam().getClass()); // 가짜객체(프록시객체)
+            System.out.println("member.team = " + member.getTeam().getName()); // 패치조인. 이 때 Team DB 조회.
+        }
+        /**
+         * [ N+1 문제 ]
+         * Member 를 조회하려고 했는데 Team 을 조회할 쿼리도 추가 실행.
+         * 네트웍 타는 성능 소모
+         * -> fetch join 으로 해결 : 연관관계 물려있는 엔티티를 한번에 조인하여 select 절에 데이터 넣어서 조회한다.
+         *
+         * [중요] Fetch Join 으로 N+1 문제를 해결 : Member 조회 시 연관된 Team도 같이 끌고와 조회함
+         * @Query("select m from Member m left join fetch m.team")
+         * List<Member> findMemberFetchJoin ();
+         */
+    }
 }
