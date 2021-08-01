@@ -3,6 +3,7 @@ package study.datajpa.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -67,4 +68,18 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     /**[중요] Fetch Join 으로 N+1 문제를 해결 : Member 조회 시 연관된 Team도 같이 끌고와 조회함  */
     @Query("select m from Member m left join fetch m.team")
     List<Member> findMemberFetchJoin();
+
+    /** EntityGraph : Member 조회 시 연관된 Team도 같이 끌고와 조회함. 내부적으로 패치조인. */
+    @Override
+    @EntityGraph(attributePaths = {"team"})
+    List<Member> findAll();
+
+    /** 패치조인 + JPQL */
+    @EntityGraph(attributePaths = {"team"})
+    @Query("select m from Member m")
+    List<Member> findMemberEntityGraph();
+
+    /** 패치조인 + 쿼리메소드 */
+    @EntityGraph(attributePaths = {"team"})
+    List<Member> findEntityGraphByUsername(@Param("username") String username);
 }

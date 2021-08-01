@@ -284,7 +284,9 @@ public class MemberRepositoryTest {
     }
 
     @Test
-    public void findMemberLazy(){/** fetch join 을 이해해야 JPA를 실무에서 쓸 수 있다. */
+    public void findMemberLazy(){
+        /**  @EntityGraph : 내부적으로 패치조인 쓰는 애노테이션
+         * fetch join 을 이해해야 JPA를 실무에서 쓸 수 있다. */
 
         Team teamA = new Team("teamA");
         Team teamB = new Team("teamB");
@@ -300,7 +302,8 @@ public class MemberRepositoryTest {
         em.clear(); // 영속성 컨텍스트 초기화
 
         // when
-        List<Member> members = memberRepository.findMemberFetchJoin();
+        // List<Member> members = memberRepository.findAll();
+        List<Member> members = memberRepository.findEntityGraphByUsername("member1");
 
         for (Member member : members) {
             System.out.println("member = " + member.getUsername());
