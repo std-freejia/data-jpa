@@ -362,5 +362,21 @@ public class MemberRepositoryTest {
         List<Member> findMember = memberRepository.findLockByUsername("member1");
     }
 
-
+    @Test
+    public void callCustom(){
+        /** querydsl, 복잡한 쿼리, DB에 직접 붙어야 한다거나.. 할 때.
+         * 인터페이스로 해결이 안되는 경우가 실무에서 은근 있다. 이럴 때 사용자 정의 레포지토리를 쓴다.
+         *
+         * [사용자 정의 레포지토리 '구현체' 명명 규칙 중요한거.]
+         * MemberRepositoryImpl
+         *
+         * 1. 사용자 정의 레포지토리 '구현체' 마지막에 'Impl' 을 붙여줘야한다.
+         * 2. 상속받을 인터페이스의 이름을 포함해서 '구현체' 이름을 지어야 한다.
+         * public interface MemberRepository extends MemberRepositoryCustom
+         * public class MemberRepositoryImpl implements MemberRepositoryCustom
+         *
+         * 사용자 정의 레포지토리 인터페이스의 이름은 상관없다.
+         * */
+        List<Member> result = memberRepository.findMemberCustom();
+    }
 }

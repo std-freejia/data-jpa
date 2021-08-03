@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 /** 인터페이스 JpaRepository를 상속받는다 */
-public interface MemberRepository extends JpaRepository<Member, Long> {
+public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
 
     /** 쿼리 메소드 */
     List<Member> findByUsernameAndAgeGreaterThan(String username, int age);
