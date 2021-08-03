@@ -254,7 +254,7 @@ public class MemberRepositoryTest {
     }
 
     @Test
-    public void bulkAgeAdd(){
+    public void bulkAgeAdd(){ /** 벌크성 수정 쿼리 */
         // given
         memberRepository.save(new Member("member1", 10));
         memberRepository.save(new Member("member2", 20));
@@ -285,8 +285,8 @@ public class MemberRepositoryTest {
 
     @Test
     public void findMemberLazy(){
-        /**  @EntityGraph : 내부적으로 패치조인 쓰는 애노테이션
-         * fetch join 을 이해해야 JPA를 실무에서 쓸 수 있다. */
+        /**  @EntityGraph
+         * : 내부적으로 패치조인 쓰는 애노테이션. fetch join 을 이해해야 JPA를 실무에서 쓸 수 있다. */
 
         Team teamA = new Team("teamA");
         Team teamB = new Team("teamB");
@@ -323,4 +323,28 @@ public class MemberRepositoryTest {
          * List<Member> findMemberFetchJoin ();
          */
     }
+
+    @Test
+    public void queryHint(){ /**  QueryHints JPA Hint & Lock */
+        // given
+        Member member1 = new Member("member1", 10);
+        Member savedMember = memberRepository.save(member1);
+        em.flush(); // JPA의 영속성 컨텍스트를 DB에 반영하는 쿼리 실행
+        em.clear(); // 영속성 컨텍스트 초기화. 비운다.
+
+        //when
+        // 실무에서는 get() 이런거 바로 쓰면 안됨.
+        //Member findMember = memberRepository.findById(savedMember.getId()).get();
+        Member findMember = memberRepository.findReadOnlyByUsername("member1");
+        findMember.setUsername("member2");
+
+        /** 이름 변경 후, "flush()"하면 변경감지(더티체킹)가 동작해서 update 쿼리를 실행함.
+         * 변경감지라는 것이 원본 데이터와 변경후 데이터 이렇게 2개를 관리해야 한다. 메모리를 소모하는 작업이다.
+         * 변경이 아니라 단순히 조회만 하는 경우에 하이버네이트가 최적화 할 수 있도록 Hint기능을 제공.
+         *
+         * @QueryHints 애노테이션 옵션을 readOnly 로 해두면 스냅샷을 안만든다.
+         * 읽기 전용. 변경감지 체크도 안한다. */
+        em.flush();
+    }
+
 }
