@@ -347,4 +347,20 @@ public class MemberRepositoryTest {
         em.flush();
     }
 
+    @Test
+    public void queryLock(){
+         /**  JPA Lock
+         애노테이션으로 편리하게 락을 걸 수 있다. 좀 깊은 내용.
+         DB 방언에 따라 동작방식이 조금다름. 정확성이 중요한 경우에 적합.
+         실시간 트래픽이 많은 서비스인 경우 되도록 락은 피하는게 좋음. */
+
+        Member member1 = new Member("member1", 10);
+        memberRepository.save(member1);
+        em.flush();
+        em.clear();
+
+        List<Member> findMember = memberRepository.findLockByUsername("member1");
+    }
+
+
 }

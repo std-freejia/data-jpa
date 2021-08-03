@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 
+import javax.persistence.LockModeType;
 import javax.persistence.QueryHint;
 import java.util.Collection;
 import java.util.List;
@@ -85,7 +86,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @EntityGraph("Member.all")
     List<Member> findNamedEntityGraphByUsername(@Param("username") String username);
 
-    /** JPA Hint & lock */
+    /** JPA Hint */
     @QueryHints(value = @QueryHint(name="org.hibernamte.readOnly", value="true"))
     Member findReadOnlyByUsername(String username);
+
+    /** JPA lock */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    List<Member> findLockByUsername(String username);
 }
